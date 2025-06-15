@@ -41,6 +41,9 @@ func main() {
 		w.Write(jsonResponse)
 	})
 
-	http.ListenAndServe(":8080", router)
+	err1 := http.ListenAndServe(":8080", router)
+	if err1 != nil{
+		fmt.Println("Server Connection failed...")
+	}
 
 }
