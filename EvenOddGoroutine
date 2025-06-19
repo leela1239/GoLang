@@ -1,0 +1,46 @@
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+func PrintEven(evenCh chan bool, oddCh chan bool, n int, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for i := 0; i <= n; i += 2 {
+		<-evenCh
+		fmt.Println("Even : ", i)
+
+		if i+1 <= n {
+			oddCh <- true
+		}
+	}
+
+}
+
+func PrintOdd(evenCh chan bool, oddCh chan bool, n int, wg *sync.WaitGroup) {
+	defer wg.Done()
+	for i := 1; i <= n; i += 2 {
+		<-oddCh
+		fmt.Println("Odd  : ", i)
+
+		if i+1 <= n {
+			evenCh <- true
+		}
+	}
+}
+
+func main() {
+
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+	evenCh := make(chan bool)
+	oddCh := make(chan bool)
+	n := 20
+
+	go PrintEven(evenCh, oddCh, n, &wg)
+	go PrintOdd(evenCh, oddCh, n, &wg)
+	evenCh <- true
+	wg.Wait()
+
+}
